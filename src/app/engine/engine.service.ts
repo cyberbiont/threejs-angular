@@ -1,7 +1,8 @@
-import * as THREE from 'three';
-import {ElementRef, Injectable, NgZone, OnDestroy} from '@angular/core';
+import * as THREE from "three";
 
-@Injectable({providedIn: 'root'})
+import { ElementRef, Injectable, NgZone, OnDestroy } from "@angular/core";
+
+@Injectable({ providedIn: "root" })
 export class EngineService implements OnDestroy {
   private canvas: HTMLCanvasElement;
   private renderer: THREE.WebGLRenderer;
@@ -10,11 +11,11 @@ export class EngineService implements OnDestroy {
   private light: THREE.AmbientLight;
 
   private cube: THREE.Mesh;
+  private ball: THREE.Mesh;
 
   private frameId: number = null;
 
-  public constructor(private ngZone: NgZone) {
-  }
+  public constructor(private ngZone: NgZone) {}
 
   public ngOnDestroy(): void {
     if (this.frameId != null) {
@@ -28,8 +29,8 @@ export class EngineService implements OnDestroy {
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
-      alpha: true,    // transparent background
-      antialias: true // smooth edges
+      alpha: true, // transparent background
+      antialias: true, // smooth edges
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -37,7 +38,10 @@ export class EngineService implements OnDestroy {
     this.scene = new THREE.Scene();
 
     this.camera = new THREE.PerspectiveCamera(
-      75, window.innerWidth / window.innerHeight, 0.1, 1000
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
     );
     this.camera.position.z = 5;
     this.scene.add(this.camera);
@@ -48,25 +52,30 @@ export class EngineService implements OnDestroy {
     this.scene.add(this.light);
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     this.cube = new THREE.Mesh(geometry, material);
+    this.ball = new THREE.Mesh(
+      new THREE.BoxGeometry(1, 2, 3),
+      new THREE.MeshBasicMaterial({ color: 0x0479d0 })
+    );
     this.scene.add(this.cube);
 
+    this.scene.add(this.ball);
   }
 
   public animate(): void {
     // We have to run this outside angular zones,
     // because it could trigger heavy changeDetection cycles.
     this.ngZone.runOutsideAngular(() => {
-      if (document.readyState !== 'loading') {
+      if (document.readyState !== "loading") {
         this.render();
       } else {
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener("DOMContentLoaded", () => {
           this.render();
         });
       }
 
-      window.addEventListener('resize', () => {
+      window.addEventListener("resize", () => {
         this.resize();
       });
     });
@@ -78,7 +87,7 @@ export class EngineService implements OnDestroy {
     });
 
     this.cube.rotation.x += 0.01;
-    this.cube.rotation.y += 0.01;
+    this.ball.rotation.y += 0.01;
     this.renderer.render(this.scene, this.camera);
   }
 

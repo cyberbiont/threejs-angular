@@ -4,7 +4,7 @@
 
 // To quickly centre a block element
 @mixin push--auto {
-  margin: { 
+  margin: {
     left: auto;
     right: auto;
   }
@@ -86,7 +86,6 @@
   @if $weight { font-weight: $weight; }
   @if $lh { line-height: $lh; }
 }
-
 
 @mixin input-placeholder {
   &.placeholder { @content; }
