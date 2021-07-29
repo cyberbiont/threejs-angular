@@ -1,6 +1,6 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
-import {EngineService} from './engine.service';
+import { EngineService } from './engine.service';
 
 @Component({
   selector: 'app-engine',
@@ -15,8 +15,6 @@ export class EngineComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.engServ.createScene(this.rendererCanvas);
-    this.engServ.animate();
+    this.engServ.init(this.rendererCanvas);
   }
-
 }

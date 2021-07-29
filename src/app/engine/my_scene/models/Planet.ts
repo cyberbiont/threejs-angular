@@ -1,15 +1,16 @@
 import * as THREE from "three";
 
-export default class Planet {
+import { TAObject } from "../lib/types";
+
+export default class Planet implements TAObject {
   private geometry: THREE.SphereGeometry;
   private material: THREE.MeshBasicMaterial;
-  private texture: THREE.Texture;
   public mesh: THREE.Mesh;
   private rotationSpeed: number;
 
   constructor(
     public name: string,
-    texturePath: string,
+    public texture: THREE.Texture,
     {
       radius = 1,
       quality = 32,
@@ -24,8 +25,6 @@ export default class Planet {
     this.rotationSpeed = rotationSpeed;
     this.geometry = new THREE.SphereGeometry(radius, quality, quality);
     // this.material = new THREE.MeshBasicMaterial({ map: this.texture });
-    const loader = new THREE.TextureLoader();
-    this.texture = loader.load(texturePath);
     this.material = new THREE.MeshBasicMaterial({ map: this.texture });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
 
