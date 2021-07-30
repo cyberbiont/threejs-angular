@@ -1,16 +1,12 @@
-// import * as dat from 'three/examples/jsm/libs/dat.gui.module.js';
-// import Dat from 'dat.gui';
-// import init from 'three-dat.gui'; // Import initialization method
-// init(Dat); // Init three-dat.gui with Dat
 import * as THREE from "three";
 
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Planet from "src/app/engine/my_scene/models/Planet";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
-import Stats from "three/examples/jsm/libs/stats.module";
 import { TAObject } from "./lib/types";
 import TAScene from "./lib/scene";
 import Loaders from "./lib/loaders";
+import { getGUI } from "./lib/gui/main";
 
 export default class TJSApp {
   private renderer: THREE.WebGLRenderer;
@@ -18,6 +14,7 @@ export default class TJSApp {
   private scene: TAScene;
 
   private controls: PointerLockControls;
+  private gui: unknown;
   // private clock: THREE.Clock;
 
   private lights: Map<string, THREE.Light>;
@@ -60,8 +57,26 @@ export default class TJSApp {
     this.scene.add(new THREE.AxesHelper(20));
     // this.clock = new THREE.Clock();
     this.createControls();
+    this.createGUI();
     this.createLight();
-    this.createObjects();
+
+    // this.createObjects();
+    this.createPlane();
+  }
+
+  private createPlane() {
+    const planeGeometry = new THREE.PlaneGeometry(100, 100, 50, 50);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x00ff00,
+      wireframe: true,
+    });
+    const plane = new THREE.Mesh(planeGeometry, material);
+    plane.rotateX(-Math.PI / 2);
+    this.scene.add(plane);
+  }
+
+  private createGUI() {
+    this.gui = getGUI();
   }
 
   private createRenderer() {
@@ -75,13 +90,23 @@ export default class TJSApp {
   }
 
   private createCamera() {
+    // this.camera = new THREE.PerspectiveCamera(
+    //   75,
+    //   window.innerWidth / window.innerHeight,
+    //   0.1,
+    //   1000
+    // );
+    // this.camera.position.z = 50;
+    // this.scene.add(this.camera);
+
     this.camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    this.camera.position.z = 50;
+    this.camera.position.y = 1;
+    this.camera.position.z = 2;
     this.scene.add(this.camera);
   }
 
@@ -90,6 +115,44 @@ export default class TJSApp {
       this.camera,
       this.renderer.domElement
     );
+    this.controls.addEventListener("change", () =>
+      console.log("Controls Change")
+    );
+    this.controls.addEventListener("lock", () => console.log("Controls lock"));
+    this.controls.addEventListener("unlock", () =>
+      console.log("Controls unlock")
+    );
+
+    const startButton = document.querySelector(
+      "#startButton"
+    ) as HTMLDivElement;
+    startButton.addEventListener("click", () => this.controls.lock());
+    this.controls.addEventListener(
+      "lock",
+      () => (startButton.style.display = "none")
+    );
+    this.controls.addEventListener(
+      "unlock",
+      () => (startButton.style.display = "block")
+    );
+
+    const onKeyDown = function (event: KeyboardEvent) {
+      switch (event.code) {
+        case "KeyW":
+          this.controls.moveForward(0.25);
+          break;
+        case "KeyA":
+          this.controls.moveRight(-0.25);
+          break;
+        case "KeyS":
+          this.controls.moveForward(-0.25);
+          break;
+        case "KeyD":
+          this.controls.moveRight(0.25);
+          break;
+      }
+    };
+    document.addEventListener("keydown", onKeyDown.bind(this), false);
   }
 
   private createLight() {
@@ -107,22 +170,22 @@ export default class TJSApp {
   }
 
   public async createObjects() {
-    const geometry = new THREE.BoxGeometry(2, 2, 2);
-    const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+    // const geometry = new THREE.BoxGeometry(2, 2, 2);
+    // const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
 
-    const cubeA = new THREE.Mesh(geometry, material);
-    cubeA.position.set(6, 6, 0);
+    // const cubeA = new THREE.Mesh(geometry, material);
+    // cubeA.position.set(6, 6, 0);
 
-    const cubeB = new THREE.Mesh(geometry, material);
-    cubeB.position.set(-6, -6, 0);
+    // const cubeB = new THREE.Mesh(geometry, material);
+    // cubeB.position.set(-6, -6, 0);
 
-    //create a group and add the two cubes
-    //These cubes can now be rotated / scaled etc as a group
-    const group = new THREE.Group();
-    group.add(cubeA);
-    group.add(cubeB);
+    // //create a group and add the two cubes
+    // //These cubes can now be rotated / scaled etc as a group
+    // const group = new THREE.Group();
+    // group.add(cubeA);
+    // group.add(cubeB);
 
-    this.scene.add(group);
+    // this.scene.add(group);
 
     // https://sbcode.net/topoearth/downloads/moon_texture.5400x2700.jpg
     // this.planets.mars = new Planet(
