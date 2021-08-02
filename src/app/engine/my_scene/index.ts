@@ -61,7 +61,19 @@ export default class TJSApp {
   }
 
   private async init() {
-    // if (this.o.autosave) this.initAutosave;
+    this.initScene();
+
+    // TODO load scene from previously stored JSON file
+    // const objectsWasLoaded = this.loadState();
+    // if (!objectsWasLoaded) return;
+
+    this.createLight();
+    this.createPlane();
+    this.createObjects();
+  }
+
+  private initScene() {
+    if (this.o.autosave) this.initAutosave();
     this.initSaveButtons();
 
     this.createRenderer();
@@ -82,11 +94,6 @@ export default class TJSApp {
     // this.createGUI();
 
     this.scene.add(new THREE.AxesHelper(20));
-
-    this.createLight();
-
-    this.createPlane();
-    this.createObjects();
   }
 
   animate() {
@@ -338,7 +345,7 @@ export default class TJSApp {
 
   private initAutosave() {
     if (this.autosaveTimeout) clearTimeout(this.autosaveTimeout);
-    this.autosaveTimeout = setTimeout(this.saveState.bind(this), 1000);
+    this.autosaveTimeout = setTimeout(this.saveState.bind(this), 5000);
   }
 
   private async saveState() {
@@ -350,39 +357,16 @@ export default class TJSApp {
 
   private async loadState() {
     // should be tested with the mock response from database for correct state loading
+
     const json = await this.rs.getStoredScene();
     if (!json) return;
+
     const sceneJSON = (json as THREE.Object3D[])[0];
-    console.log(sceneJSON);
     const loader = new THREE.ObjectLoader();
     this.scene = loader.parse(sceneJSON);
     // const camera = loader.parse(json.camera) as THREE.PerspectiveCamera;
     // this.createControls();
+    // this.renderer.render(this.scene, this.camera);
     return true;
   }
-
-  // public load(json: any) {
-  //   const loader = new THREE.ObjectLoader();
-
-  //   // backwards
-  //   if (json.scene === undefined) {
-  //     const scene = loader.parse(json);
-  //     this.scene = scene as TAScene;
-  //     return;
-  //   }
-
-  //   const camera = loader.parse(json.camera) as THREE.PerspectiveCamera;
-
-  //   this.camera.position.copy(camera.position);
-  //   this.camera.rotation.copy(camera.rotation);
-  //   this.camera.aspect = camera.aspect;
-  //   this.camera.near = camera.near;
-  //   this.camera.far = camera.far;
-
-  //   this.scene = json.scene as TAScene;
-  //   // this.setScene(loader.parse(json.scene));
-  //   // this.scripts = json.scripts;
-
-  //   // const obj = new THREE.ObjectLoader().parse(json);
-  // }
 }

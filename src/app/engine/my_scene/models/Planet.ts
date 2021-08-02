@@ -14,7 +14,7 @@ export default class Planet implements TAObject {
     {
       radius = 1,
       quality = 32,
-      rotationSpeed = 0.005,
+      rotationSpeed = 0.002,
     }: {
       radius?: number;
       quality?: number;
@@ -24,15 +24,8 @@ export default class Planet implements TAObject {
     this.name = name;
     this.rotationSpeed = rotationSpeed;
     this.geometry = new THREE.SphereGeometry(radius, quality, quality);
-    // this.material = new THREE.MeshBasicMaterial({ map: this.texture });
     this.material = new THREE.MeshBasicMaterial({ map: this.texture });
     this.mesh = new THREE.Mesh(this.geometry, this.material);
-
-    // loader.load(texturePath, (texture) => {
-    //   this.texture = texture;
-    //   this.material = new THREE.MeshBasicMaterial({ map: this.texture });
-    //   this.mesh = new THREE.Mesh(this.geometry, this.material);
-    // });
   }
 
   add(scene: THREE.Object3D) {
