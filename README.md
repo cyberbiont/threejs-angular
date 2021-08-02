@@ -1,43 +1,21 @@
-# ng-three-template
+# threejs-angular test
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) and is designed as a basic
-template for [ThreeJS](https://threejs.org/) combined with [Angular](https://angular.io/)
-and [Bootstrap](https://getbootstrap.com/) in Version 4.x
+## Prerequisites
 
-The project is setup to use global [SCSS](https://sass-lang.com/) only
-and [ViewEncapsulation.None](https://angular.io/api/core/ViewEncapsulation).
+You must have Node.js >= 15.12.0 and MongoDB >= 5.0.0 installed in your system.
 
-Feel free to do anything you want with this template.
+## Installation / quick start
 
-## Three Links
+run `npm install`
+if error about dependency resolution is shown, try `npm i --force`.
 
-* Three Extensions: https://github.com/Itee/three-full
-* Three-Full Types: https://discourse.threejs.org/t/angular-threejs/2739/7
+run `npx ng serve` to start development server. navigate to http://localhost:4200/
 
-## Development server
+run `npx ng build --prod` to build production version of app.
+run `npm serve` to start node server. Application will be served on http://localhost:8081/
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change
-any of the source files.
+## TODO
 
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also
-use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag
-for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out
-the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+The app state is successfully exported and saved on server,
+but loading the scene from JSON doesn't work in full as intended.
+This will hopefully be fixed soon.
