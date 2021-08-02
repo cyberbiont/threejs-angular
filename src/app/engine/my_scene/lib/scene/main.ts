@@ -1,7 +1,6 @@
 import * as THREE from "three";
-import Loaders from "../loaders";
 
-// this show how the project can be expanded and elements put to separate modules
+import Loaders from "../loaders";
 export default class TAScene extends THREE.Scene {
   constructor(private loaders: Loaders) {
     super();

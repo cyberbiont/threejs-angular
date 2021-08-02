@@ -1,7 +1,8 @@
-import * as dat from "three/examples/jsm/libs/dat.gui.module.js";
-import Dat from "three/examples/jsm/libs/dat.gui.module.js";
-import init from "three-dat.gui"; // Import initialization method
+// import Dat from "three/examples/jsm/libs/dat.gui.module.js";
+import * as Dat from "dat.gui";
 import * as THREE from "three";
+
+import init from "three-dat.gui"; // Import initialization method
 
 export function getGUI() {
   init(Dat);

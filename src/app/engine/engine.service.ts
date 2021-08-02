@@ -5,8 +5,8 @@ import TJSApp from "./my_scene";
 @Injectable({ providedIn: "root" })
 export class EngineService implements OnDestroy {
 
-  private frameId: number = null;
-  public app: TJSApp;
+  private frameId: number | null = null;
+  public app!: TJSApp;
 
   public constructor(private ngZone: NgZone) {}
 

@@ -1,38 +1,42 @@
 import * as THREE from "three";
 
+import { GUI } from "dat.gui";
+import Loaders from "./lib/loaders";
+import { Mushroom } from "./models/mushroom";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Planet from "src/app/engine/my_scene/models/Planet";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 import { TAObject } from "./lib/types";
 import TAScene from "./lib/scene";
-import Loaders from "./lib/loaders";
 import { getGUI } from "./lib/gui/main";
 
 export default class TJSApp {
-  private renderer: THREE.WebGLRenderer;
-  private camera: THREE.PerspectiveCamera;
-  private scene: TAScene;
+  private renderer!: THREE.WebGLRenderer;
+  private camera!: THREE.PerspectiveCamera;
+  private scene!: TAScene;
 
-  private controls: PointerLockControls;
-  private gui: unknown;
+  private controls!: PointerLockControls;
+  private orbitControls?: OrbitControls;
+  private gui!: GUI;
   // private clock: THREE.Clock;
 
-  private lights: Map<string, THREE.Light>;
+  private lights: Map<string, THREE.Light> = new Map();
   private objects: {
     [category: string]: Map<string, TAObject>;
   } = {};
 
-  private textures: Map<string, THREE.Texture>;
-  private geometries: Map<string, THREE.BufferGeometry>;
+  // private textures: Map<string, THREE.Texture>;
+  // private geometries: Map<string, THREE.BufferGeometry>;
 
   constructor(private canvas: HTMLCanvasElement) {
-    this.compose();
+    this.init();
   }
 
   animate() {
     Object.values(this.objects).forEach((category) =>
       category.forEach((obj) => obj.animate())
     );
+    if (this.orbitControls) this.orbitControls.update();
 
     this.renderer.render(this.scene, this.camera);
   }
@@ -47,7 +51,9 @@ export default class TJSApp {
     this.renderer.setSize(width, height);
   }
 
-  private async compose() {
+  private async init() {
+    this.loadSaved();
+
     this.createRenderer();
 
     const loaders = new Loaders();
@@ -56,12 +62,17 @@ export default class TJSApp {
 
     this.scene.add(new THREE.AxesHelper(20));
     // this.clock = new THREE.Clock();
+
+    this.createCamera();
+
     this.createControls();
+    // this.createOrbitControls();
     this.createGUI();
+
     this.createLight();
 
-    // this.createObjects();
     this.createPlane();
+    this.createObjects();
   }
 
   private createPlane() {
@@ -110,6 +121,14 @@ export default class TJSApp {
     this.scene.add(this.camera);
   }
 
+  private createOrbitControls() {
+    this.orbitControls = new OrbitControls(
+      this.camera,
+      this.renderer.domElement
+    );
+    this.orbitControls.update();
+  }
+
   private createControls() {
     this.controls = new PointerLockControls(
       this.camera,
@@ -136,7 +155,7 @@ export default class TJSApp {
       () => (startButton.style.display = "block")
     );
 
-    const onKeyDown = function (event: KeyboardEvent) {
+    const onKeyDown = (event: KeyboardEvent) => {
       switch (event.code) {
         case "KeyW":
           this.controls.moveForward(0.25);
@@ -151,6 +170,7 @@ export default class TJSApp {
           this.controls.moveRight(0.25);
           break;
       }
+      if (this.orbitControls) this.orbitControls.update();
     };
     document.addEventListener("keydown", onKeyDown.bind(this), false);
   }
@@ -159,13 +179,13 @@ export default class TJSApp {
     // soft white light
     const ambientLight = new THREE.AmbientLight(0x404040);
     ambientLight.position.z = 2;
-    // this.lights.set("ambient", ambientLight);
+    this.lights.set("ambient", ambientLight);
     this.scene.add(ambientLight);
 
     // directional light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(-1, 2, 4);
-    // this.lights.set("directional", directionalLight);
+    this.lights.set("directional", directionalLight);
     this.scene.add(directionalLight);
   }
 
@@ -205,6 +225,12 @@ export default class TJSApp {
     });
     this.scene.add(earth.mesh);
 
+    // const shroom = Mushroom (capSize, stalkHeight, stalkTop, stalkBottom, capScaleY, capOffsetY)
+    // shroom.setColors("0xffffff", "0xdddddd", "0xfffff");
+    // shroom.setTextures("./img/cap1.png", "./img/ucap1.png", "./img/stalk1.png");
+    // shroom.create();
+
+    // this.scene.add(shroom.model);
     // this.objects.planets.set('earth', earth);
 
     // const moon = new Planet(
@@ -224,5 +250,52 @@ export default class TJSApp {
     //     radius: 1,
     //   }
     // ).add(this.scene);
+  }
+
+  public save() {
+    const json = this.scene.toJSON();
+    return json;
+  }
+
+  public loadSaved() {
+    
+  }
+
+  public load(json: JSON) {
+    new THREE.ObjectLoader().parse(json);
+
+    //     var jsonLoader = new THREE.JSONLoader();
+    // jsonLoader.load("models/object.json", addModelToScene);
+
+    // function addModelToScene(geometry, materials) {
+    //     var material = new THREE.MeshFaceMaterial(materials);
+    //     var object = new THREE.Mesh(geometry, material);
+    //     object.scale.set(10, 10, 10);
+    //     scene.add(object);
+    // }
+  }
+
+  public fromJSON(json: JSON) {
+    const loader = new THREE.ObjectLoader();
+
+    // backwards
+    // if (json.scene === undefined) {
+    //     const scene = loader.parse(json);
+    //     this.setScene(scene);
+    //     return;
+    // }
+
+    // TODO: Clean this up somehow
+
+    // const camera = loader.parse(json.camera);
+
+    // this.camera.position.copy(camera.position);
+    // this.camera.rotation.copy(camera.rotation);
+    // this.camera.aspect = camera.aspect;
+    // this.camera.near = camera.near;
+    // this.camera.far = camera.far;
+
+    // this.setScene(loader.parse(json.scene));
+    // this.scripts = json.scripts;
   }
 }
