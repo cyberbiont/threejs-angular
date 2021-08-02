@@ -1,18 +1,20 @@
 /*****************************************************
  * node_modules imports
  *****************************************************/
-@import 'node_modules/bootstrap/scss/bootstrap.scss';
 
 /*****************************************************
  * project imports
  *****************************************************/
-@import 'variables';
-@import 'mixins';
+@import "variables";
+@import "mixins";
 
 /*****************************************************
  * styles
  *****************************************************/
-html, body, app-root, app-game {
+html,
+body,
+app-root,
+app-game {
   overflow: hidden;
   width: 100%;
   height: 100%;
@@ -50,4 +52,26 @@ body {
   * {
     z-index: 10;
   }
+}
+
+.informer,
+.button--ui {
+  background: black;
+  color: $mainTextColor;
+
+  padding: 1em;
+}
+
+.button--ui {
+  cursor: pointer;
+  border: thin solid grey;
+}
+
+.button--ui:hover {
+  background: #111;
+}
+
+app-ui-infobar-top {
+  display: grid;
+  gap: 1em;
 }
