@@ -59,7 +59,7 @@ body {
   background: black;
   color: $mainTextColor;
 
-  padding: 1em;
+  padding: 0.5em;
 }
 
 .button--ui {
@@ -73,5 +73,5 @@ body {
 
 app-ui-infobar-top {
   display: grid;
-  gap: 1em;
+  gap: 0.5em;
 }
