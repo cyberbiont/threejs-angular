@@ -65,9 +65,7 @@ export default class TJSApp {
   private async init() {
     this.initScene();
 
-    // TODO load scene from previously stored JSON file
-    // const objectsWasLoaded = this.loadState();
-    // if (!objectsWasLoaded) return;
+    this.loadState();
 
     this.createLight();
     this.createPlane();
@@ -176,16 +174,16 @@ export default class TJSApp {
       this.camera,
       this.renderer.domElement
     );
-    // this.controls.addEventListener("change", () =>
-    //   console.log("Controls Change")
-    // );
+    /* this.controls.addEventListener("change", () =>
+      console.log("Controls Change")
+    );
     this.controls.addEventListener("lock", () => {
       console.log("Controls lock");
       console.log(this.controls);
     });
     this.controls.addEventListener("unlock", () =>
       console.log("Controls unlock")
-    );
+    ); */
 
     const startButton = document.querySelector(
       this.o.sel.lockCamera
@@ -207,7 +205,6 @@ export default class TJSApp {
       switch (event.code) {
         case "KeyW":
           this.controls.moveForward(0.25);
-          console.log("W key pressed");
           break;
         case "KeyA":
           this.controls.moveRight(-0.25);
