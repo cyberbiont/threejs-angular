@@ -16,6 +16,5 @@ run `npm serve` to start node server. Application will be served on http://local
 
 ## TODO
 
-The app state is successfully exported and saved on server,
-but loading the scene from JSON doesn't work in full as intended.
-This will hopefully be fixed soon.
+Currently only the users location on the scene is saved/restored,
+the same should be done for all scene objects
