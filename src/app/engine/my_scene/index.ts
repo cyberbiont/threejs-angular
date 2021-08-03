@@ -40,7 +40,7 @@ export default class TJSApp {
   };
   private o: TJSAppOptions;
 
-  private autosaveTimeout?: NodeJS.Timeout;
+  private autosaveTimer?: NodeJS.Timer;
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -350,8 +350,8 @@ export default class TJSApp {
 
   // TODO extract methods into separate module that will use rest service
   private initAutosave() {
-    if (this.autosaveTimeout) clearTimeout(this.autosaveTimeout);
-    this.autosaveTimeout = setTimeout(this.saveState.bind(this), 5000);
+    if (this.autosaveTimer) clearInterval(this.autosaveTimer);
+    this.autosaveTimer = setInterval(this.saveState.bind(this), 10000);
   }
 
   private async saveState() {
@@ -359,6 +359,7 @@ export default class TJSApp {
     // this.scene.updateMatrixWorld()
     const json = this.camera.toJSON();
     this.rs.put(json);
+    console.log("saved");
   }
 
   private async loadState() {
