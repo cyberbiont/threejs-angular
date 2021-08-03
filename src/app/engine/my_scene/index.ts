@@ -4,6 +4,7 @@ import { GUI } from "dat.gui";
 import Loaders from "./lib/loaders";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Planet from "src/app/engine/my_scene/models/Planet";
+import { PointLight } from "three";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 import { RestService } from "src/app/services/rest/rest.service";
 import { TAAnimatable } from "./lib/types";
@@ -19,7 +20,6 @@ interface TJSAppOptions {
   };
 }
 
-
 export default class TJSApp {
   private renderer!: THREE.WebGLRenderer;
   private camera!: THREE.PerspectiveCamera;
@@ -33,17 +33,14 @@ export default class TJSApp {
 
   private lights: Map<string, THREE.Light> = new Map();
   private objects: {
-    [category: string]: Map<string, TAAnimatable>,
-    planets: Map<string, Planet & TAAnimatable>
+    [category: string]: Map<string, TAAnimatable>;
+    planets: Map<string, Planet & TAAnimatable>;
   } = {
-    planets: new Map()
+    planets: new Map(),
   };
   private o: TJSAppOptions;
 
   private autosaveTimeout?: NodeJS.Timeout;
-
-  // private textures: Map<string, THREE.Texture>;
-  // private geometries: Map<string, THREE.BufferGeometry>;
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -179,13 +176,16 @@ export default class TJSApp {
       this.camera,
       this.renderer.domElement
     );
-    /* this.controls.addEventListener("change", () =>
-      console.log("Controls Change")
-    );
-    this.controls.addEventListener("lock", () => console.log("Controls lock"));
+    // this.controls.addEventListener("change", () =>
+    //   console.log("Controls Change")
+    // );
+    this.controls.addEventListener("lock", () => {
+      console.log("Controls lock");
+      console.log(this.controls);
+    });
     this.controls.addEventListener("unlock", () =>
       console.log("Controls unlock")
-    ); */
+    );
 
     const startButton = document.querySelector(
       this.o.sel.lockCamera
@@ -207,6 +207,7 @@ export default class TJSApp {
       switch (event.code) {
         case "KeyW":
           this.controls.moveForward(0.25);
+          console.log("W key pressed");
           break;
         case "KeyA":
           this.controls.moveRight(-0.25);
@@ -253,8 +254,7 @@ export default class TJSApp {
       {
         radius: 3,
       }
-    )
-      .addToScene(this.scene)
+    ).addToScene(this.scene);
     mars.position.set(0, 25, 25);
     this.objects.planets.set("mars", mars);
 
@@ -266,8 +266,7 @@ export default class TJSApp {
       {
         radius: 6371 / 1000,
       }
-    )
-      .addToScene(this.scene)
+    ).addToScene(this.scene);
     earth.position.set(-10, 20, -20);
     this.objects.planets.set("earth", earth);
 
@@ -279,8 +278,7 @@ export default class TJSApp {
       {
         radius: 1737 / 1000,
       }
-    )
-      .addToScene(this.scene)
+    ).addToScene(this.scene);
     moon.position.set(-10, 20, 10);
     this.objects.planets.set("moon", moon);
 
@@ -292,8 +290,7 @@ export default class TJSApp {
       {
         radius: 2,
       }
-    )
-      .addToScene(this.scene)
+    ).addToScene(this.scene);
     deathstar.position.set(0, 30, 0);
     this.objects.planets.set("deathstar", deathstar);
   }
@@ -306,7 +303,10 @@ export default class TJSApp {
         Math.random() * 16,
         Math.random() * 4
       );
-      const mat = new THREE.MeshBasicMaterial({ wireframe: true });
+      const mat = new THREE.MeshPhongMaterial({
+        opacity: 0.9,
+        transparent: true,
+      });
       switch (i % 3) {
         case 0:
           mat.color = new THREE.Color(0xff0000);
@@ -321,7 +321,7 @@ export default class TJSApp {
       const cube = new THREE.Mesh(geo, mat);
       cubes.push(cube);
     }
-    cubes.forEach((c) => {
+    cubes.forEach((c, i) => {
       c.position.x = Math.random() * 100 - 50;
       c.position.z = Math.random() * 100 - 50;
       c.geometry.computeBoundingBox();
@@ -329,6 +329,7 @@ export default class TJSApp {
         ((c.geometry.boundingBox as THREE.Box3).max.y -
           (c.geometry.boundingBox as THREE.Box3).min.y) /
         2;
+
       this.scene.add(c);
     });
   }
@@ -350,6 +351,7 @@ export default class TJSApp {
       saveButton.addEventListener("click", this.saveState.bind(this));
   }
 
+  // TODO extract methods into separate module that will use rest service
   private initAutosave() {
     if (this.autosaveTimeout) clearTimeout(this.autosaveTimeout);
     this.autosaveTimeout = setTimeout(this.saveState.bind(this), 5000);
@@ -358,19 +360,23 @@ export default class TJSApp {
   private async saveState() {
     // should be tested fir actually generating the JSON
     // this.scene.updateMatrixWorld()
-    const json = this.scene.toJSON();
-    this.rs.storeScene(json);
+    const json = this.camera.toJSON();
+    this.rs.put(json);
   }
 
   private async loadState() {
     // should be tested with the mock response from database for correct state loading
 
-    const json = await this.rs.getStoredScene();
-    if (!json) return;
+    const jsonArr = await this.rs.get();
+    if (!jsonArr) return;
 
-    const sceneJSON = (json as THREE.Object3D[])[0];
+    // const sceneJSON = (json as THREE.Object3D[])[0];
     const loader = new THREE.ObjectLoader();
-    this.scene = loader.parse(sceneJSON);
+    const json = (jsonArr as THREE.Object3D[])[0];
+    this.camera = loader.parse(json);
+
+    if (this.controls) this.controls.dispose();
+    this.createControls();
     // const camera = loader.parse(json.camera) as THREE.PerspectiveCamera;
     // this.createControls();
     // this.renderer.render(this.scene, this.camera);
