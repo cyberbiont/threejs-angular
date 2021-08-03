@@ -1,4 +1,3 @@
-export interface TAObject {
-  mesh: THREE.Mesh
+export interface TAAnimatable {
   animate(): this
 }

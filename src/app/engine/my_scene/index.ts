@@ -6,7 +6,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Planet from "src/app/engine/my_scene/models/Planet";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls";
 import { RestService } from "src/app/services/rest/rest.service";
-import { TAObject } from "./lib/types";
+import { TAAnimatable } from "./lib/types";
 import TAScene from "./lib/scene";
 import { getGUI } from "./lib/gui/main";
 
@@ -18,6 +18,8 @@ interface TJSAppOptions {
     loadState: string;
   };
 }
+
+
 export default class TJSApp {
   private renderer!: THREE.WebGLRenderer;
   private camera!: THREE.PerspectiveCamera;
@@ -31,8 +33,11 @@ export default class TJSApp {
 
   private lights: Map<string, THREE.Light> = new Map();
   private objects: {
-    [category: string]: Map<string, TAObject>;
-  } = {};
+    [category: string]: Map<string, TAAnimatable>,
+    planets: Map<string, Planet & TAAnimatable>
+  } = {
+    planets: new Map()
+  };
   private o: TJSAppOptions;
 
   private autosaveTimeout?: NodeJS.Timeout;
@@ -233,8 +238,12 @@ export default class TJSApp {
   }
 
   public async createObjects() {
+    this.createPlanets();
+    this.createCubes();
+  }
+
+  private async createPlanets() {
     const loaders = new Loaders();
-    this.objects.planets = new Map();
 
     const mars = new Planet(
       "Mars",
@@ -244,9 +253,9 @@ export default class TJSApp {
       {
         radius: 3,
       }
-    );
-    this.scene.add(mars.mesh);
-    mars.mesh.position.set(0, 25, 25);
+    )
+      .addToScene(this.scene)
+    mars.position.set(0, 25, 25);
     this.objects.planets.set("mars", mars);
 
     const earth = new Planet(
@@ -257,9 +266,9 @@ export default class TJSApp {
       {
         radius: 6371 / 1000,
       }
-    );
-    this.scene.add(earth.mesh);
-    earth.mesh.position.set(-10, 20, -20);
+    )
+      .addToScene(this.scene)
+    earth.position.set(-10, 20, -20);
     this.objects.planets.set("earth", earth);
 
     const moon = new Planet(
@@ -270,9 +279,9 @@ export default class TJSApp {
       {
         radius: 1737 / 1000,
       }
-    );
-    earth.mesh.add(moon.mesh);
-    moon.mesh.position.set(-10, 20, 10);
+    )
+      .addToScene(this.scene)
+    moon.position.set(-10, 20, 10);
     this.objects.planets.set("moon", moon);
 
     const deathstar = new Planet(
@@ -283,15 +292,13 @@ export default class TJSApp {
       {
         radius: 2,
       }
-    ).add(this.scene);
-    this.scene.add(deathstar.mesh);
-    deathstar.mesh.position.set(0, 30, 0);
+    )
+      .addToScene(this.scene)
+    deathstar.position.set(0, 30, 0);
     this.objects.planets.set("deathstar", deathstar);
-
-    this.addCubes();
   }
 
-  private addCubes() {
+  private createCubes() {
     const cubes: THREE.Mesh[] = [];
     for (let i = 0; i < 50; i++) {
       const geo = new THREE.BoxGeometry(

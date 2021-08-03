@@ -1,11 +1,10 @@
 import * as THREE from "three";
 
-import { TAObject } from "../lib/types";
+import { TAAnimatable } from "../lib/types";
 
-export default class Planet implements TAObject {
-  private geometry: THREE.SphereGeometry;
-  private material: THREE.MeshBasicMaterial;
-  public mesh: THREE.Mesh;
+// this is an example of custom class that extends basic Mesh class
+// with predefined geometry / material type and custon animation method
+export default class Planet extends THREE.Mesh implements TAAnimatable  {
   private rotationSpeed: number;
 
   constructor(
@@ -21,24 +20,21 @@ export default class Planet implements TAObject {
       rotationSpeed?: number;
     } = {}
   ) {
+    super(
+      new THREE.SphereGeometry(radius, quality, quality),
+      new THREE.MeshBasicMaterial({ map: texture })
+    );
     this.name = name;
     this.rotationSpeed = rotationSpeed;
-    this.geometry = new THREE.SphereGeometry(radius, quality, quality);
-    this.material = new THREE.MeshBasicMaterial({ map: this.texture });
-    this.mesh = new THREE.Mesh(this.geometry, this.material);
   }
 
-  add(scene: THREE.Object3D) {
-    scene.add(this.mesh);
+  addToScene(scene: THREE.Object3D) {
+    scene.add(this);
     return this;
   }
 
   animate() {
-    this.mesh.rotation.y += this.rotationSpeed;
+    this.rotation.y += this.rotationSpeed;
     return this;
-  }
-
-  get() {
-    return this.mesh;
   }
 }
