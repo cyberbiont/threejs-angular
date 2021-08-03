@@ -5,35 +5,36 @@ import { Injectable } from "@angular/core";
   providedIn: "root",
 })
 export class RestService {
-  threeJSApiURL: string = "http://localhost:8081/api/three";
+  url: string = "http://localhost:8081/api/three";
   constructor(private http: HttpClient) {}
 
-  async getStoredScene() {
+  async get() {
     try {
-      return this.http.get(this.threeJSApiURL).toPromise();
+      return this.http.get(this.url).toPromise();
     } catch (e) {
       return this.onError(e);
     }
   }
 
-  async storeScene(sceneJSON: JSON) {
+  async put(json: JSON) {
     try {
       return this.http
-        .put(this.threeJSApiURL, sceneJSON, { responseType: "text" })
+        .put(this.url, json, { responseType: "text" })
         .toPromise();
     } catch (e) {
       return this.onError(e);
     }
   }
 
-  async deleteStoredScene() {
+  async delete() {
     try {
-      return this.http.delete(this.threeJSApiURL).toPromise();
+      return this.http.delete(this.url).toPromise();
     } catch (e) {
       return this.onError(e);
     }
   }
 
+  // TODO implement global error handing with ErrorHandler and HTTP Error Interceptor
   onError(e: any) {
     const message = e.message
       ? e.message
